@@ -11,7 +11,6 @@
       height: 100%;
       overflow: hidden;
       background-color: black;
-      /* pasang background-image langsung di body */
       background: url('./media/loading.jpg') no-repeat center center fixed;
       background-size: cover;
       display: flex;
@@ -22,7 +21,7 @@
     .loader {
       display: flex;
       gap: 6px;
-      z-index: 1; /* pastikan di atas background */
+      z-index: 1;
     }
 
     .bar {
@@ -56,8 +55,8 @@
   </div>
 
   <script>
-    // Simulasi waktu loading 4–12 detik
-    const delay = (Math.floor(Math.random() * 9) + 4) * 1000; // 4–12 detik
+    // Redirect setelah 5 detik
+    const delay = 5000;
     setTimeout(() => {
       window.location.href = './home';
     }, delay);
