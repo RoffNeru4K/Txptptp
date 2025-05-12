@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1, minimum-scale=1">
+  <title>Navbar, Login, dan Config JSON</title>
+  <link href="https://fonts.googleapis.com/css2?family=Days+One&display=swap" rel="stylesheet">
+  <style>
+    /* Reset & nonaktifkan tap highlight */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+    button:focus, img:focus {
+      outline: none;
+      border: none;
+    }
+    html, body {
+      width: 100%;
+      overflow-x: hidden;
+      overflow-y: auto;
+      background-color: #12151C;
+      font-family: 'Days One', sans-serif;
+    }
+    /* Navbar */
+    .navbar {
+      height: 50px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 10px;
+      position: relative;
+    }
+    .logo {
+      height: 100%;
+      width: auto;
+      margin-left: 3px;
+      margin-top: 3px;
+      cursor: pointer;
+    }
+    .login-img {
+      max-height: 50px;
+      width: auto;
+      position: absolute;
+      top: 1px;
+      right: -19px;
+      cursor: pointer;
+    }
+    /* Overlay & Pop-up */
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      opacity: 0;
+      transition: opacity 0.8s ease-in-out;
+      display: none;
+      z-index: 9;
+    }
+    .popup {
+      position: fixed;
+      bottom: -100%;
+      left: 0;
+      width: 100%;
+      background: #28292E;
+      border-radius: 15% 15% 0 0;
+      padding: 20px;
+      transition: bottom 0.3s ease-in-out;
+      z-index: 10;
+      height: 250px;
+    }
+    .popup-header {
+      display: flex;
+      align-items: flex-end;
+      color: white;
+      margin-bottom: 20px;
+    }
+    .popup-header #authText {
+      font-size: 18px;
+      margin-right: 2px;
+      cursor: pointer;
+    }
+    .popup-header .or {
+      color: #828284;
+      font-size: 0.75em;
+      margin-right: 2px;
+    }
+    .popup-header .signup {
+      color: white;
+      font-size: 0.75em;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+    .close-btn {
+      margin-left: auto;
+      cursor: pointer;
+      width: 24px;
+    }
+    .container button {
+      border: none;
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 25px;
+      cursor: pointer;
+      margin-bottom: 5px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-weight: bold;
+    }
+    .btn-whatsapp { background-color: #29D249; color: white; }
+    .btn-telegram { background-color: #24A5E6; color: white; }
+.btn-google {
+  background-color: black;
+  color: white;
+}
+    .container button img { height: 20px; }
+    .emoji-genesis {
+      height: 1em;
+      width: auto;
+      vertical-align: middle;
+    }
+    /* Container untuk item JSON */
+    #adsContainer, #productsContainer {
+      padding: 0 7px;
+      width: calc(100% - 14px);
+      margin: 20px auto;
+    }
+    #adsContainer {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    #productsContainer {
+      display: flex;
+      gap: 7px;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+    .item {
+      position: relative;
+      background: #12151C;
+    }
+    .item a, .item div {
+      text-decoration: none;
+      color: inherit;
+    }
+    .img-container {
+      position: relative;
+      overflow: hidden;
+    }
+    .item img {
+      display: block;
+      width: 100%;
+    }
+    .item-title {
+      margin-top: 10px;
+      text-align: left;
+      color: white;
+      font-size: 22px;
+      padding: 0 7px;
+    }
+    .item.ads { width: 100%; }
+    .item.product { flex: 0 0 calc(50% - 7px); }
+    .cc-overlay {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      padding: 4px 6px;
+      font-size: calc(12px * 0.96);
+    }
+    .cc-overlay.primary {
+      background: black;
+      border-radius: 50px;
+      color: white;
+    }
+    .cc-overlay.secondary {
+      background: rgba(255,255,255,0.2);
+      backdrop-filter: blur(4px);
+      border-radius: 50px;
+      color: white;
+    }
+    .cc-overlay img {
+      display: inline-block;
+      height: 1em;
+      width: auto;
+      vertical-align: middle;
+    }
+    /* CSS untuk ads-slide dengan fade transition, aspect ratio 16:9, dan auto slide setiap 4,5 detik */
+.ads-slide-container {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 2%;
+}
+    .ads-slide-container .slide {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      transition: opacity 0.7s ease-in-out;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .ads-slide-container .slide.active {
+      opacity: 1;
+    }
+    .ads-slide-container .slide img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+      margin: auto;
+    }
+    /* CSS untuk tipe ui-text */
+    .ui-text {
+      color: white;
+      font-size: 18px;
+      text-align: left;
+      padding: 10px 7px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar dan Pop-up -->
+  <div class="navbar">
+    <img src="./media/logoStar.png" alt="Logo" class="logo" onclick="window.location.href='/'">
+    <img src="./media/login.png" alt="Login" class="login-img" onclick="openPopup()">
+  </div>
+  <div class="overlay" id="overlay" onclick="closePopup()"></div>
+  <div class="popup" id="popup">
+    <div class="popup-header">
+      <span id="authText" onclick="toggleAuth()">Login</span>
+      <span class="or">atau</span>
+      <span class="signup" onclick="toggleAuth()">Signup</span>
+      <img src="./media/close.png" alt="Close" class="close-btn" onclick="closePopup()">
+    </div>
+    <div class="container">
+      <button class="btn-whatsapp">
+        <img src="./media/whatsapp.png" alt="WA"> WhatsApp
+      </button>
+      <button class="btn-telegram">
+        <img src="./media/telegram.png" alt="TG"> Telegram
+      </button>
+      <button class="btn-google">
+        <img src="./media/google.png" alt="Google"> Google
+      </button>
+    </div>
+  </div>
+  
+  <!-- Container untuk item JSON -->
+  <div id="adsContainer"></div>
+  <div id="productsContainer"></div>
+  
+  <script>
+    // Fungsi pop-up (tidak diubah)
+    function openPopup() {
+      document.getElementById("popup").style.bottom = "0";
+      let overlay = document.getElementById("overlay");
+      overlay.style.display = "block";
+      setTimeout(() => { overlay.style.opacity = "1"; }, 10);
+    }
+    function closePopup() {
+      document.getElementById("popup").style.bottom = "-100%";
+      let overlay = document.getElementById("overlay");
+      overlay.style.opacity = "0";
+      setTimeout(() => { overlay.style.display = "none"; }, 800);
+    }
+    function toggleAuth() {
+      let authText = document.getElementById("authText");
+      let signupText = document.querySelector(".signup");
+      if (authText.innerText === "Login") {
+        authText.innerText = "Signup";
+        signupText.innerText = "Login";
+      } else {
+        authText.innerText = "Login";
+        signupText.innerText = "Signup";
+      }
+    }
+    
+    // Fungsi membuat overlay CC
+    function createCcElement(ccText) {
+      let isPrimary = false;
+      if (ccText.startsWith("x")) {
+        ccText = ccText.substring(1);
+        isPrimary = true;
+      }
+      let span = document.createElement("span");
+      span.innerHTML = ccText;
+      span.classList.add("cc-overlay");
+      if (isPrimary) { span.classList.add("primary"); }
+      else { span.classList.add("secondary"); }
+      return span;
+    }
+    
+    // Fungsi untuk membuat slide pada ads-slide (fade transition)
+    function createSlideElement(imgSrc, redirectUrl) {
+      let slide;
+      if (redirectUrl) {
+        slide = document.createElement("a");
+        slide.href = redirectUrl;
+      } else {
+        slide = document.createElement("div");
+      }
+      slide.classList.add("slide");
+      let img = document.createElement("img");
+      img.src = imgSrc;
+      img.alt = "";
+      slide.appendChild(img);
+      return slide;
+    }
+    
+    // Inisialisasi ads-slide dengan auto slide setiap 4,5 detik menggunakan setTimeout
+    function initAdSlide(sliderContainer) {
+      const slides = sliderContainer.querySelectorAll('.slide');
+      const totalSlides = slides.length;
+      let currentSlide = 0;
+      const autoDelay = 4500; // 4,5 detik
+      let autoTimer;
+      
+      function showSlide(newIndex) {
+        slides[currentSlide].classList.remove('active');
+        currentSlide = (newIndex + totalSlides) % totalSlides;
+        slides[currentSlide].classList.add('active');
+      }
+      
+      function scheduleNextSlide() {
+        clearTimeout(autoTimer);
+        autoTimer = setTimeout(() => {
+          showSlide(currentSlide + 1);
+          scheduleNextSlide();
+        }, autoDelay);
+      }
+      
+      function resetAutoSlide() {
+        clearTimeout(autoTimer);
+        scheduleNextSlide();
+      }
+      
+      // Inisialisasi slide pertama
+      slides[currentSlide].classList.add('active');
+      scheduleNextSlide();
+      
+      // Deteksi swipe (touch & mouse)
+      let touchStartX = 0, touchEndX = 0;
+      const threshold = 50;
+      
+      sliderContainer.addEventListener('touchstart', (e) => {
+        touchStartX = e.touches[0].clientX;
+      });
+      sliderContainer.addEventListener('touchend', (e) => {
+        touchEndX = e.changedTouches[0].clientX;
+        if (touchEndX - touchStartX > threshold) {
+          showSlide(currentSlide - 1);
+          resetAutoSlide();
+        } else if (touchEndX - touchStartX < -threshold) {
+          showSlide(currentSlide + 1);
+          resetAutoSlide();
+        }
+      });
+      
+      sliderContainer.addEventListener('mousedown', (e) => {
+        touchStartX = e.clientX;
+      });
+      sliderContainer.addEventListener('mouseup', (e) => {
+        touchEndX = e.clientX;
+        if (touchEndX - touchStartX > threshold) {
+          showSlide(currentSlide - 1);
+          resetAutoSlide();
+        } else if (touchEndX - touchStartX < -threshold) {
+          showSlide(currentSlide + 1);
+          resetAutoSlide();
+        }
+      });
+    }
+    
+    // Fungsi untuk merender item dari JSON
+    function renderItems(items) {
+      const adsContainer = document.getElementById("adsContainer");
+      const productsContainer = document.getElementById("productsContainer");
+      adsContainer.innerHTML = "";
+      productsContainer.innerHTML = "";
+      
+      items.forEach(item => {
+        let itemDiv = document.createElement("div");
+        itemDiv.classList.add("item");
+        if(item.type === "ads" || item.type === "ads-slide") {
+          itemDiv.classList.add("ads");
+        } else if(item.type === "product") {
+          itemDiv.classList.add("product");
+        } else if(item.type === "ui-text") {
+          itemDiv.classList.add("ui-text");
+          itemDiv.innerText = item.text;
+          adsContainer.appendChild(itemDiv);
+          return;
+        }
+        
+        if(item.type === "ads-slide") {
+          // Buat slider container untuk ads-slide
+          let slideContainer = document.createElement("div");
+          slideContainer.classList.add("ads-slide-container");
+          let slidesArray = item.img;         // array gambar
+          let redirectsArray = item.redirect;  // array redirect
+          for(let i = 0; i < slidesArray.length; i++){
+            let slide = createSlideElement(slidesArray[i], redirectsArray[i]);
+            slideContainer.appendChild(slide);
+          }
+          itemDiv.appendChild(slideContainer);
+          initAdSlide(slideContainer);
+        }
+        else {
+          // Untuk ads biasa dan product
+          let imageWrapper;
+          if(item.redirect) {
+            imageWrapper = document.createElement("a");
+            imageWrapper.href = item.redirect;
+            imageWrapper.style.textDecoration = "none";
+            imageWrapper.style.color = "inherit";
+          } else {
+            imageWrapper = document.createElement("div");
+          }
+          let imgContainer = document.createElement("div");
+          imgContainer.classList.add("img-container");
+          let imgElem = document.createElement("img");
+          imgElem.src = item.img;
+          imgElem.alt = item.title ? item.title : "";
+          imgContainer.appendChild(imgElem);
+          if(item.cc && item.cc.length > 0){
+            item.cc.forEach(ccText => {
+              let ccElem = createCcElement(ccText);
+              imgContainer.appendChild(ccElem);
+            });
+          }
+          imageWrapper.appendChild(imgContainer);
+          itemDiv.appendChild(imageWrapper);
+          if(item.title){
+            let titleDiv = document.createElement("div");
+            titleDiv.classList.add("item-title");
+            titleDiv.innerText = item.title;
+            titleDiv.style.color = "white";
+            itemDiv.appendChild(titleDiv);
+          }
+        }
+        
+        if(item.type === "ads" || item.type === "ads-slide"){
+          adsContainer.appendChild(itemDiv);
+        } else if(item.type === "product"){
+          productsContainer.appendChild(itemDiv);
+        }
+      });
+    }
+    
+    // Contoh konfigurasi JSON
+    var configItems = [
+      {
+        "type": "ads-slide",
+        "img": ["./media/benner/1.png", "./media/benner/2.png", "./media/benner/3.png", "./media/benner/4.png"],
+        "cc": [],
+        "title": null,
+        "redirect": ["./link1.html", "./link2.html", "./link3.html"]
+      },
+      {"type": "ads", "img": "./media/benner/top.png", "cc": [], "title": null, "redirect": null},
+        {
+    "type": "product",
+    "img": "./media/game/hsr.png",
+    "cc": ["xOneiric Shard ✴️"],
+    "title": "Honkai: Star Rail",
+    "redirect": "./honkaistarrail"
+  },
+  {
+    "type": "product",
+    "img": "./media/game/gi.png",
+    "cc": ["xGenesis Crystal *️⃣"],
+    "title": "Genshin Impact",
+    "redirect": "./genshinimpact"
+  },
+  {
+    "type": "product",
+    "img": "./media/game/pbm.png",
+    "cc": ["xUC 🎯"],
+    "title": "PUBG Mobile",
+    "redirect": "./pubgmobile"
+  },
+  {
+    "type": "product",
+    "img": "./media/game/zzz.png",
+    "cc": ["xMonochrome 🎨"],
+    "title": "Zenless Zone Zero",
+    "redirect": "./zenlesszonezero"
+  },
+  {
+    "type": "product",
+    "img": "./media/game/wuwa.png",
+    "cc": ["xLustrous Tide 💫"],
+    "title": "Wuthering Waves",
+    "redirect": "./wutheringwaves"
+  },
+  {
+    "type": "product",
+    "img": "./media/game/hok.png",
+    "cc": ["xToken 🔶"],
+    "title": "Honor of Kings",
+    "redirect": "./honorofkings"
+  },
+      {"type": "ui-text", "text": "Selamat datang di situs kami!"}
+    ];
+    
+    document.addEventListener("DOMContentLoaded", function() {
+      renderItems(configItems);
+      replaceEmoji(document.body);
+    });
+    
+    // Konfigurasi emoji
+    const emojiConfig = {
+      "*️⃣": {
+        src: "./media/cc/genesis.png",
+        alt: "Genesis Crystal",
+        class: "emoji-genesis"
+      },
+      "🔶": {
+        src: "./media/cc/token.png",
+        alt: "Token",
+        class: "emoji-token"
+      },
+      "🎯": {
+        src: "./media/cc/uc.png",
+        alt: "Unknown Cash",
+        class: "emoji-uc"
+      },
+      "💫": {
+        src: "./media/cc/lustrous.png",
+        alt: "Lustrous Tide",
+        class: "emoji-lustrous"
+      },
+      "🎨": {
+        src: "./media/cc/monochrome.png",
+        alt: "MMonochrome",
+        class: "emoji-monochrome"
+      },
+      "✴️": {
+        src: "./media/cc/oneiric.png",
+        alt: "Oneiric Shard",
+        class: "emoji-oneiric"
+      }
+    };
+    
+    function replaceEmoji(node) {
+      if (node.nodeType === Node.TEXT_NODE) {
+        let newValue = node.nodeValue;
+        let replaced = false;
+        Object.keys(emojiConfig).forEach(function(emojiKey) {
+          if(newValue.includes(emojiKey)){
+            const { src, alt, class: className } = emojiConfig[emojiKey];
+            const imgTag = `<img src="${src}" alt="${alt}" class="${className}">`;
+            newValue = newValue.replace(new RegExp(escapeRegExp(emojiKey), 'g'), imgTag);
+            replaced = true;
+          }
+        });
+        if(replaced){
+          const span = document.createElement("span");
+          span.innerHTML = newValue;
+          node.parentNode.replaceChild(span, node);
+        }
+      } else if(node.nodeType === Node.ELEMENT_NODE && node.nodeName !== "SCRIPT" && node.nodeName !== "STYLE"){
+        for(let i = 0; i < node.childNodes.length; i++){
+          replaceEmoji(node.childNodes[i]);
+        }
+      }
+    }
+    
+    function escapeRegExp(string) {
+      return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+  </script>
+</body>
+</html>

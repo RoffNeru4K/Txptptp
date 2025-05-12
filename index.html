@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Loading…</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      background-color: black;
+      /* pasang background-image langsung di body */
+      background: url('./media/loading.jpg') no-repeat center center fixed;
+      background-size: cover;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .loader {
+      display: flex;
+      gap: 6px;
+      z-index: 1; /* pastikan di atas background */
+    }
+
+    .bar {
+      width: 6px;
+      height: 40px;
+      background: #03E780;
+      animation: bounce 1.2s infinite ease-in-out;
+    }
+
+    .bar:nth-child(1) { animation-delay: 0s; }
+    .bar:nth-child(2) { animation-delay: 0.1s; }
+    .bar:nth-child(3) { animation-delay: 0.2s; }
+    .bar:nth-child(4) { animation-delay: 0.3s; }
+    .bar:nth-child(5) { animation-delay: 0.4s; }
+    .bar:nth-child(6) { animation-delay: 0.5s; }
+
+    @keyframes bounce {
+      0%, 40%, 100% { transform: scaleY(0.4); }
+      20% { transform: scaleY(1); }
+    }
+  </style>
+</head>
+<body>
+  <div class="loader">
+    <div class="bar"></div>
+    <div class="bar"></div>
+    <div class="bar"></div>
+    <div class="bar"></div>
+    <div class="bar"></div>
+    <div class="bar"></div>
+  </div>
+
+  <script>
+    // Simulasi waktu loading 4–12 detik
+    const delay = (Math.floor(Math.random() * 9) + 4) * 1000; // 4–12 detik
+    setTimeout(() => {
+      window.location.href = './home.html';
+    }, delay);
+  </script>
+</body>
+</html>
